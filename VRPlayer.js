@@ -1,6 +1,6 @@
 class VRPlayer {
-    constructor({parent, video_id, height, width, src_height, src_width}) {
-        this.video_elem = document.getElementById(video_id);
+    constructor({parent, video_elem, height, width, src_height, src_width}) {
+        this.video_elem = video_elem;
         this.parent = parent;
         this.rendering = true;
         this.state = {
@@ -74,7 +74,6 @@ class VRPlayer {
             .initialize_camera()
             .initialize_sphere()
             .bind_event_listeners(this.renderer.domElement)
-
         this.parent.appendChild(this.renderer.domElement);
         const sphere_material = new THREE.MeshBasicMaterial();
         this.video_texture = new THREE.Texture(this.video_canvas);
