@@ -17,6 +17,7 @@ class VRPlayer {
             src_height,
             src_width,
         }
+        this.pan_camera = false;
         this.video_canvas = null;
         this.video_canvas_context = null;
         this.renderer = null;
@@ -60,6 +61,9 @@ class VRPlayer {
     }
 
     bind_event_listeners(bind_elem) {
+        bind_elem.addEventListener('mousedown', this.on_document_mouse_down.bind(this), false);
+        bind_elem.addEventListener('mousemove', this.on_document_mouse_move.bind(this), false);
+        bind_elem.addEventListener('mouseup', this.on_document_mouse_up.bind(this), false);
         return this;
     }
 
@@ -77,17 +81,47 @@ class VRPlayer {
         sphere_material.map = this.video_texture;
         const sphere_mesh = new THREE.Mesh(this.sphere, sphere_material);
         this.scene.add(sphere_mesh);
-        this.render();
+        this.toggle_render(true);
         return this;
     }
 
-    // toggle_render(tsoggle) {
-    //     if toggle {
-    //         this.rendering = true;
-    //     }
-    // }
+    //Probably want to flesh this out a bit.
+    teardown() {
+        this.renderer.domElement.remove();
+    }
+
+    toggle_render(toggle) {
+        if (toggle) {
+            this.rendering = true;
+            this.render();
+        } else {
+            this.rendering = false;
+        }
+    }
+
+
+    on_document_mouse_down(event) {
+        event.preventDefault();
+        this.pan_camera = true;
+        this.state.savedX = event.clientX;
+        this.state.savedY = event.clientY;
+        this.state.savedLongitude = this.state.longitude;
+        this.state.savedLatitude = this.state.latitude;
+    }
+
+    on_document_mouse_up(event) {
+        this.pan_camera = false;
+    }
+
+    on_document_mouse_move(event) {
+        if (!this.pan_camera) return;
+        const {longitude, latitude, savedLatitude, savedLongitude, savedX, savedY} = this.state;
+        this.state.longitude = (savedX - event.clientX) * 0.3 + savedLongitude;
+        this.state.latitude = (event.clientY - savedY) * 0.3 + savedLatitude;
+    }
 
     render() {
+        if (!this.rendering) return;
         requestAnimationFrame(this.render.bind(this));
 
         if ( this.video_elem.readyState === this.video_elem.HAVE_ENOUGH_DATA ) {
