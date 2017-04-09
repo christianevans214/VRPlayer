@@ -1,6 +1,7 @@
 class VRPlayer {
     constructor({parent, video_elem, height, width, src_height, src_width}) {
         this.video_elem = video_elem;
+        this.video_elem.crossOrigin = "anonymous";
         this.parent = parent;
         this.rendering = true;
         this.state = {
@@ -80,7 +81,7 @@ class VRPlayer {
         sphere_material.map = this.video_texture;
         const sphere_mesh = new THREE.Mesh(this.sphere, sphere_material);
         this.scene.add(sphere_mesh);
-        this.toggle_render(true);
+        // this.toggle_render(true);
         return this;
     }
 
